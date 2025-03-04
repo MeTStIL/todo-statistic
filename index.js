@@ -48,6 +48,33 @@ function getFiles() {
     return filePaths.map(path => readFile(path));
 }
 
+function showComments(commentsArr) {
+    const importanceArr = [];
+    const authorArr = [];
+    const dateArr = [];
+    const commentArr = [];
+
+    for (const comment of commentsArr) {
+        importanceArr.push(comment.importance.toString());
+        authorArr.push(comment.author.toString());
+        dateArr.push(comment.date.toString());
+        commentArr.push(comment.comment.toString());
+    }
+    const importanceMaxLen = Math.max(...importanceArr.map(x => x.length));
+    const authorMaxLen = Math.max(...authorArr.map(x => x.length));
+    const dateMaxLen = Math.max(...dateArr.map(x => x.length));
+    const commentMaxLen = Math.max(...commentArr.map(x => x.length));
+
+    for (const comment of commentsArr) {
+        const row = (comment.importance > 0 ? '!' : '').padEnd(importanceMaxLen) + '  |  '
+            + comment.author.padEnd(authorMaxLen) + '  |  '
+            + comment.date.toString().padEnd(dateMaxLen) + '  |  '
+            + comment.comment;
+        console.log(row);
+    }
+}
+
+
 function processCommand(input) {
     const [command, arg] = input.split(' ', 2);
 
@@ -57,48 +84,28 @@ function processCommand(input) {
             process.exit(0);
             break;
         case 'show':
-            for (const comment of allComments) {
-                console.log(comment.comment);
-            }
+            showComments(allComments);
             break;
 
         case 'important':
-            for (const comment of allComments) {
-                if (comment.importance !== 0) {
-                    console.log(comment.comment);
-                }
-            }
+            showComments(allComments.filter(comm => comm.importance > 0))
             break;
 
         case 'user':
-            for (const comment of allComments) {
-                const author = comment.author;
-                if (author === arg.toLowerCase()) {
-                    console.log(comment.comment);
-                }
-            }
+            showComments(allComments.filter(comm => comm.author === arg.toLowerCase()))
             break;
 
         case 'sort':
             if (arg === 'importance') {
-                allComments.sort((a, b) => b.importance - a.importance);
-                for (const comment of allComments) {
-                    console.log(comment.comment);
-                }
+                showComments(allComments.sort((a, b) => b.importance - a.importance))
             }
 
             if (arg === 'user') {
-                allComments.sort((a, b) => a.author.localeCompare(b.author));
-                for (const comment of allComments) {
-                    console.log(comment.comment);
-                }
+                showComments(allComments.sort((a, b) => a.author.localeCompare(b.author)));
             }
 
             if (arg === 'date') {
-                allComments.sort((a, b) => b.date - a.date);
-                for (const comment of allComments) {
-                    console.log(comment.comment);
-                }
+                showComments(allComments.sort((a, b) => b.date - a.date));
             }
             break;
 
