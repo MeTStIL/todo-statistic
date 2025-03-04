@@ -2,6 +2,19 @@ const {getAllFilePathsWithExtension, readFile} = require('./fileSystem');
 const {readLine} = require('./console');
 
 const files = getFiles();
+const allComments = []
+
+for (const e of files) {
+    const linesInFile = e.split('\r\n');
+    for (line of linesInFile) {
+        const index = isComment(line)
+        if (index !== -1) {
+            allComments.push(line.slice(index));
+        }
+    }
+}
+
+
 
 //console.log(require)
 console.log('Please, write your command!');
@@ -29,6 +42,14 @@ function processCommand(command) {
 
             }
             break;
+
+        case 'important':
+            for (const comment of allComments) {
+                if (comment.indexOf('!') !== -1) {
+                    console.log(comment)
+                }
+            }
+            break
         default:
             console.log('wrong command');
             break;
