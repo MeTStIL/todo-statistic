@@ -100,6 +100,16 @@ function processCommand(input) {
                     console.log(comment.comment);
                 }
             }
+            break;
+
+        case 'date':
+            const argDate = new Date(arg);
+            for (const comment of allComments) {
+                if (comment.date >= argDate) {
+                    console.log(comment.comment);
+                }
+            }
+            break;
 
         default:
             console.log('wrong command');
