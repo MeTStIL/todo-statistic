@@ -8,11 +8,47 @@ for (const e of files) {
     const linesInFile = e.split('\r\n');
     for (line of linesInFile) {
         const comment = getComment(line);
-        if (comment !== null)
-            allComments.push(comment);
+        if (comment == null) continue;
+
+        // определяем важность
+        let importantCounter = 0;
+        for (const element of comment) {
+            if (element === '!') {
+                importantCounter += 1;
+            }
+        }
+
+        // определяем имя
+        const author = comment.slice(8, comment.indexOf(';')).toString().toLowerCase();
+
+        // дату
+        let date = comment.slice(comment.indexOf(';') + 1, comment.indexOf(';', 2)).toString().trim();
+        date = new Date(date);
+
+        // if (author.toLowerCase() === arg.toLowerCase()) {
+        //     console.log(comment);
+        // }
+
+        allComments.push({
+            comment: comment,
+            importance: importantCounter,
+            author: author,
+            date: date
+        })
+    }
+
+    for (const comment of allComments) {
+        if (comment.indexOf('!') !== -1) {
+            let importantCounter = 0;
+            for (const element of comment) {
+                if (element === '!') {
+                    importantCounter += 1;
+                }
+            }
+            impArr.push({comment: comment, important: importantCounter})
+        }
     }
 }
-
 
 
 //console.log(require)
