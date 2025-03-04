@@ -7,10 +7,9 @@ const allComments = []
 for (const e of files) {
     const linesInFile = e.split('\r\n');
     for (line of linesInFile) {
-        const index = isComment(line)
-        if (index !== -1) {
-            allComments.push(line.slice(index));
-        }
+        const comment = getComment(line);
+        if (comment !== null)
+            allComments.push(comment);
     }
 }
 
@@ -28,40 +27,54 @@ function getFiles() {
 function processCommand(input) {
     const [command, arg] = input.split(' ', 2);
 
+
     switch (command) {
         case 'exit':
             process.exit(0);
             break;
-
         case 'show':
-            for (const e of files) {
-                const linesInFile = e.split('\r\n');
-                for (line of linesInFile) {
-                    const comment = getComment(line);
-                    if (comment !== null)
-                        console.log(comment);
-                }
-
+            for (const comment of allComments) {
+                console.log(comment);
             }
             break;
 
         case 'important':
             for (const comment of allComments) {
                 if (comment.indexOf('!') !== -1) {
-                    console.log(comment)
+                    console.log(comment);
                 }
             }
             break;
 
         case 'user':
-
             for (const comment of allComments) {
-                const author = comment.slice(8, comment.indexOf(';'))
+                const author = comment.slice(8, comment.indexOf(';'));
                 if (author.toLowerCase() === arg.toLowerCase()) {
-                    console.log(comment)
+                    console.log(comment);
                 }
             }
             break;
+
+        case 'sort':
+            if (arg === 'importance') {
+                const impArr = [];
+
+                for (const comment of allComments) {
+                    if (comment.indexOf('!') !== -1) {
+                        let importantCounter = 0;
+                        for (const element of comment) {
+                            if (element === '!') {
+                                importantCounter += 1;
+                            }
+                        }
+                        impArr.push({comment: comment, important: importantCounter})
+                    }
+                }
+                impArr.sort((a, b) => b.important - a.important);
+                for (const comment of impArr) {
+                    console.log(comment.comment)
+                }
+            }
 
         default:
             console.log('wrong command');
@@ -90,6 +103,8 @@ function getStringBounds(str) {
     return bounds;
 }
 
+
+// TODO Timofey; 2005-01-15; LALLLLL!!!!!
 function isCommentInString(index, stringBounds) {
     return stringBounds.some(([fr, to]) => fr < index && index < to);
 }
