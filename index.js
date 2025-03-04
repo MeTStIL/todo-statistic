@@ -1,11 +1,12 @@
 const {getAllFilePathsWithExtension, readFile} = require('./fileSystem');
 const {readLine} = require('./console');
+const path = require('node:path');
 
 const files = getFiles();
 const allComments = []
 
-for (const e of files) {
-    const linesInFile = e.split('\r\n');
+for (const [filePath, fileText] of files) {
+    const linesInFile = fileText.split('\r\n');
     for (line of linesInFile) {
         const comment = getComment(line);
         if (comment == null) continue;
@@ -29,11 +30,15 @@ for (const e of files) {
         //     console.log(comment);
         // }
 
+        // файл
+        const filename = path.basename(filePath);
+
         allComments.push({
             comment: comment,
             importance: importantCounter,
             author: author,
-            date: date
+            date: date,
+            filename: filename,
         })
     }
 }
@@ -45,30 +50,48 @@ readLine(processCommand);
 
 function getFiles() {
     const filePaths = getAllFilePathsWithExtension(process.cwd(), 'js');
-    return filePaths.map(path => readFile(path));
+    return filePaths.map(path => [path, readFile(path)]);
 }
 
 function showComments(commentsArr) {
     const importanceArr = [];
     const authorArr = [];
     const dateArr = [];
+    const filenameArr = [];
     const commentArr = [];
 
     for (const comment of commentsArr) {
         importanceArr.push(comment.importance.toString());
         authorArr.push(comment.author.toString());
         dateArr.push(comment.date.toString());
+        filenameArr.push(comment.filename.toString());
         commentArr.push(comment.comment.toString());
     }
     const importanceMaxLen = Math.max(...importanceArr.map(x => x.length));
     const authorMaxLen = Math.max(...authorArr.map(x => x.length));
     const dateMaxLen = Math.max(...dateArr.map(x => x.length));
+    const filenameMaxLen = Math.max(...filenameArr.map(x => x.length));
     const commentMaxLen = Math.max(...commentArr.map(x => x.length));
 
+    const header = '!'.padEnd(importanceMaxLen) + '  |  '
+        + 'user'.padEnd(authorMaxLen) + '  |  '
+        + 'date'.padEnd(dateMaxLen) + '  |  '
+        + 'filename'.padEnd(filenameMaxLen) + '  |  '
+        + 'comment';
+    const hr = '-'.repeat(
+        importanceMaxLen +
+        authorMaxLen +
+        dateMaxLen +
+        filenameArr +
+        commentMaxLen + 12
+    )
+    console.log(header)
+    console.log(hr)
     for (const comment of commentsArr) {
         const row = (comment.importance > 0 ? '!' : '').padEnd(importanceMaxLen) + '  |  '
             + comment.author.padEnd(authorMaxLen) + '  |  '
             + comment.date.toString().padEnd(dateMaxLen) + '  |  '
+            + comment.filename.padEnd(filenameMaxLen) + '  |  '
             + comment.comment;
         console.log(row);
     }
