@@ -36,6 +36,14 @@ function processCommand(command) {
                 console.log(comment)
             }
             break;
+
+        case 'important':
+            for (const comment of allComments) {
+                if (comment.indexOf('!') !== -1) {
+                    console.log(comment)
+                }
+            }
+            break
         default:
             console.log('wrong command');
             break;
