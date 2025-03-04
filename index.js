@@ -25,7 +25,9 @@ function getFiles() {
     return filePaths.map(path => readFile(path));
 }
 
-function processCommand(command) {
+function processCommand(input) {
+    const [command, arg] = input.split(' ', 2);
+
     switch (command) {
         case 'exit':
             process.exit(0);
@@ -43,7 +45,18 @@ function processCommand(command) {
                     console.log(comment)
                 }
             }
-            break
+            break;
+
+        case 'user':
+
+            for (const comment of allComments) {
+                const author = comment.slice(8, comment.indexOf(';'))
+                if (author.toLowerCase() === arg.toLowerCase()) {
+                    console.log(comment)
+                }
+            }
+            break;
+
         default:
             console.log('wrong command');
             break;
