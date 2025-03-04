@@ -22,7 +22,7 @@ for (const e of files) {
         const author = comment.slice(8, comment.indexOf(';')).toString().toLowerCase();
 
         // дату
-        let date = comment.slice(comment.indexOf(';') + 1, comment.indexOf(';', 2)).toString().trim();
+        let date = comment.slice(comment.indexOf(';') + 1, comment.indexOf(';', comment.indexOf(';') + 1)).toString().trim();
         date = new Date(date);
 
         // if (author.toLowerCase() === arg.toLowerCase()) {
@@ -35,18 +35,6 @@ for (const e of files) {
             author: author,
             date: date
         })
-    }
-
-    for (const comment of allComments) {
-        if (comment.indexOf('!') !== -1) {
-            let importantCounter = 0;
-            for (const element of comment) {
-                if (element === '!') {
-                    importantCounter += 1;
-                }
-            }
-            impArr.push({comment: comment, important: importantCounter})
-        }
     }
 }
 
@@ -70,45 +58,46 @@ function processCommand(input) {
             break;
         case 'show':
             for (const comment of allComments) {
-                console.log(comment);
+                console.log(comment.comment);
             }
             break;
 
         case 'important':
             for (const comment of allComments) {
-                if (comment.indexOf('!') !== -1) {
-                    console.log(comment);
+                if (comment.importance !== 0) {
+                    console.log(comment.comment);
                 }
             }
             break;
 
         case 'user':
             for (const comment of allComments) {
-                const author = comment.slice(8, comment.indexOf(';'));
-                if (author.toLowerCase() === arg.toLowerCase()) {
-                    console.log(comment);
+                const author = comment.author;
+                if (author === arg.toLowerCase()) {
+                    console.log(comment.comment);
                 }
             }
             break;
 
         case 'sort':
             if (arg === 'importance') {
-                const impArr = [];
-
+                allComments.sort((a, b) => b.importance - a.importance);
                 for (const comment of allComments) {
-                    if (comment.indexOf('!') !== -1) {
-                        let importantCounter = 0;
-                        for (const element of comment) {
-                            if (element === '!') {
-                                importantCounter += 1;
-                            }
-                        }
-                        impArr.push({comment: comment, important: importantCounter})
-                    }
+                    console.log(comment.comment);
                 }
-                impArr.sort((a, b) => b.important - a.important);
-                for (const comment of impArr) {
-                    console.log(comment.comment)
+            }
+
+            if (arg === 'user') {
+                allComments.sort((a, b) => a.author.localeCompare(b.author));
+                for (const comment of allComments) {
+                    console.log(comment.comment);
+                }
+            }
+
+            if (arg === 'date') {
+                allComments.sort((a, b) => b.date - a.date);
+                for (const comment of allComments) {
+                    console.log(comment.comment);
                 }
             }
 
